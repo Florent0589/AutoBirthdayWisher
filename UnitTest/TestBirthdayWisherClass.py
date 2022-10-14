@@ -3,11 +3,9 @@ from ServiceReference.BirthdayWisherClass import BirthdayWisher
 wisher = BirthdayWisher()
 
 
-def test_update_employee(emp_id):
-    emp = {
-        'id': emp_id
-    }
-    test = wisher.update_employee(emp)
+def test_update_employee(emp_id, params):
+
+    test = wisher.update_employee(emp_id, params)
     if not test:
         print('Failed to update employee')
     else:
@@ -33,6 +31,7 @@ def test_send_email(email, subject, message):
 
 
 if __name__ == '__main__':
-    test_update_employee(100)
-    test_get_employees('02-15')
-    test_send_email('', 'Test', 'This is suppose to be a birthday wish, one , two, three')
+
+    test_update_employee(100, {'dateOfBirth': '1989-02-29T00:00:00'})
+    # test_get_employees('02-15')
+    # test_send_email('', 'Test', 'This is suppose to be a birthday wish, one , two, three')

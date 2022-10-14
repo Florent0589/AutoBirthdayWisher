@@ -99,7 +99,13 @@ class BirthdayWisher:
                 msg = f'Happy Birthday {full_names}, we wishes you all the best on your special day'
                 sent = self.send_mail(email_address, subject=subject, message=msg)
                 if sent:
-                    self.update_employee(emp)
+                    notification_date = datetime.datetime.now()
+                    notification_date = notification_date.strftime("%y-%m-%d")
+                    params = dict(
+                        lastNotification=notification_date,
+                        lastBirthdayNotified=notification_date
+                    )
+                    self.update_employee(emp['id'], params)
                 return True
         except Exception as err:
             print(str(err))
@@ -129,21 +135,16 @@ class BirthdayWisher:
             print((str(error)))
             return False
 
-    def update_employee(self, emp: dict):
+    def update_employee(self, emp_id: int, params):
 
         """
         Update employee after sending message
-        :param emp:
+        :param emp_id:
+        :param params:
         :return bool:
         """
         try:
-            notification_date = datetime.datetime.now()
-            notification_date = notification_date.strftime("%y-%m-%d")
-            params = dict(
-                lastNotification=notification_date,
-                lastBirthdayNotified=notification_date
-            )
-            emp_id = str(emp['id'])
+            emp_id = str(emp_id)
             r = requests.patch(self.config.get_employees_api + '/' + emp_id, json=params)
             updated_employee = r.json()
             if len(updated_employee) != 0:
