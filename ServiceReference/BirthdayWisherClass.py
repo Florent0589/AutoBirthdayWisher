@@ -11,13 +11,16 @@ import calendar
 class BirthdayWisher:
 
     config = Configurations()
-    today = '02-28'#datetime.datetime.now().strftime("%m-%d")
+    today = datetime.datetime.now().strftime("%m-%d")
     year_now = int(datetime.datetime.now().strftime("%Y"))
 
     def get_employees(self, search_filter=None):
-
+        """
+        Get all employees based on filters from endpoint
+        :param search_filter:
+        :return:
+        """
         try:
-
             r = requests.get(self.config.get_employees_api)
             if search_filter is not None:
                 r = requests.get(self.config.get_employees_api, params=search_filter)
@@ -29,7 +32,7 @@ class BirthdayWisher:
 
     def get_birthday_users(self):
         """
-        Get employees from endpoint
+        Get employees for current day
         :return: dict
         """
         bday_users = list()
