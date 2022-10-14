@@ -11,7 +11,7 @@ import calendar
 class BirthdayWisher:
 
     config = Configurations()
-    today = datetime.datetime.now().strftime("%m-%d")
+    today = '02-28'#datetime.datetime.now().strftime("%m-%d")
     year_now = int(datetime.datetime.now().strftime("%Y"))
 
     def get_employees(self, search_filter=None):
@@ -22,8 +22,7 @@ class BirthdayWisher:
             if search_filter is not None:
                 r = requests.get(self.config.get_employees_api, params=search_filter)
             employees = r.json()
-            if len(employees) != 0:
-                return employees
+            return employees
         except requests.RequestException as err:
             print(str(err))
         return None
@@ -34,14 +33,26 @@ class BirthdayWisher:
         :return: dict
         """
         bday_users = list()
+        employees = list()
         if calendar.isleap(self.year_now):
             params = {'dateOfBirth_like': self.today}
+            employees = self.get_employees(params)
         else:
+            params = {'dateOfBirth_like': self.today}
+            leap_employees = None
+            normal_employees = self.get_employees(params)
             if self.today == '02-28':
                 self.today = '02-29'
-            params = {'dateOfBirth_like': self.today}
+                params = {'dateOfBirth_like': self.today}
+                leap_employees = self.get_employees(params)
 
-        employees = self.get_employees(params)
+            if leap_employees is not None and normal_employees is not None:
+                employees = normal_employees + leap_employees
+            elif leap_employees is None and normal_employees is not None:
+                employees = normal_employees
+            elif leap_employees is not None and normal_employees is None:
+                employees = leap_employees
+
         if employees is not None and len(employees) != 0:
             for employee in employees:
                 can_send_wishes = self.can_send_employee(employee)
@@ -106,7 +117,7 @@ class BirthdayWisher:
                         lastBirthdayNotified=notification_date
                     )
                     self.update_employee(emp['id'], params)
-                return True
+            return True
         except Exception as err:
             print(str(err))
 
